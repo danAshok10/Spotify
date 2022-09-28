@@ -200,12 +200,12 @@ final class APICaller{
         
     }
     public func createPlayList(with name: String, completion: @escaping (Bool) -> Void){
-        getCurrentUserProfile { (result) in
+        getCurrentUserProfile {[weak self] (result) in
             switch result {
             
             case .success(let user):
                 let url = Constant.baseURL + "/users/\(user.id)/playlists"
-                self.createRequest(with: URL(string: url), type: .POST) { (request) in
+                self?.createRequest(with: URL(string: url), type: .POST) { (request) in
                     URLSession.shared.dataTask(with: request) { (data, _, error) in
                         guard let data = data, error == nil else{
                             return

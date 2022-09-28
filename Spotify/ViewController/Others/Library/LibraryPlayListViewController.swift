@@ -23,9 +23,29 @@ class LibraryPlayListViewController: UIViewController {
         noPlayListView.configUIWithVM(with: ActionLabelViewModel(text: "No PlayList Added", actionTitle: "Add PlayList"))
         noPlayListView.delegate = self
         
+        //updateUI()
+        fetchData()
         
+        
+        
+        
+    }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        noPlayListView.frame = CGRect(x: 0, y: 0, width: 150, height: 175)
+        noPlayListView.center = view.center
+    }
+    
+    private func fetchData(){
+        let group = DispatchGroup()
+        group.enter()
         DispatchQueue.main.async {
             APICaller.shared.getCurrentUserPlayList { (result) in
+                
+                defer{
+                    group.leave()
+                }
                 switch result{
                 
                 case .success(let playList):
@@ -38,19 +58,17 @@ class LibraryPlayListViewController: UIViewController {
                 }
             }
         }
-        
-        
+        group.notify(queue: .main){
+            self.updateUI()
+        }
     }
-    
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        noPlayListView.frame = CGRect(x: 0, y: 0, width: 150, height: 175)
-        noPlayListView.center = view.center
-    }
-    
     private func updateUI(){
+        print("Items.count in updateUI \(items.count)")
         if items.count == 0{
-            noPlayListView.isHidden = false
+            DispatchQueue.main.async {
+                self.noPlayListView.isHidden = false
+            }
+            
         }else{
             
         }
