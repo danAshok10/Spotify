@@ -212,11 +212,12 @@ final class APICaller{
                         }
                         do {
                             let json = try JSONSerialization.jsonObject(with: data, options: .allowFragments)
+                            print("Created: \(json)")
                             completion(true)
                         }catch{
                             completion(false)
                         }
-                    }
+                    }.resume()
                 }
             case .failure(let error):
                 completion(false)
