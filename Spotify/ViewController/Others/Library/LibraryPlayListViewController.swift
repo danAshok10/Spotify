@@ -14,6 +14,7 @@ class LibraryPlayListViewController: UIViewController {
     var noPlayListView = ActionLabelView()
 
     var items = [Item]()
+    public var selectionHandler: ((Item) -> Void)?
     
     private let tableView : UITableView = {
         let tableView = UITableView(frame: .zero, style: .grouped)
@@ -35,6 +36,10 @@ class LibraryPlayListViewController: UIViewController {
         
         //updateUI()
         fetchData()
+        
+        if selectionHandler != nil {
+            navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .close, target: self, action: #selector(didTapCloseBtn))
+        }
     }
     
     override func viewDidLayoutSubviews() {
@@ -104,6 +109,10 @@ class LibraryPlayListViewController: UIViewController {
             }
         }
     }
+    
+    @objc func didTapCloseBtn(){
+        dismiss(animated: true, completion: nil)
+    }
 }
 
 extension LibraryPlayListViewController: actionLabelViewDelegate{
@@ -132,6 +141,13 @@ extension LibraryPlayListViewController: UITableViewDataSource, UITableViewDeleg
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         let item = items[indexPath.row]
+        
+        guard selectionHandler == nil else{
+            selectionHandler!(item)
+            dismiss(animated: true, completion: nil)
+            return
+        }
+            
         let vc = PlayListViewController(with: item)
         navigationItem.largeTitleDisplayMode = .never
         navigationController?.pushViewController(vc, animated: true)

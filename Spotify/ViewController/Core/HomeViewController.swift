@@ -51,7 +51,8 @@ class HomeViewController: UIViewController {
         view.addSubview(spinner)
         fetchData()
         collectionView.register(NewReleaseCollectionViewCell.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "header")
-       
+        addToPlayListOnLongTapGesture()
+        
     }
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
@@ -144,7 +145,38 @@ class HomeViewController: UIViewController {
         
         
     }
-   
+    private func addToPlayListOnLongTapGesture(){
+        let gesture = UILongPressGestureRecognizer(target: self, action: #selector(didLongPress(_:)))
+        collectionView.isUserInteractionEnabled = true
+        collectionView.addGestureRecognizer(gesture)
+    }
+    @objc func didLongPress(_ gesture: UILongPressGestureRecognizer){
+        guard gesture.state == .began else {
+            return
+        }
+        let touchPoint = gesture.location(in: collectionView)
+        guard let indexPath = collectionView.indexPathForItem(at: touchPoint), indexPath.section == 2 else{
+            return
+        }
+        let model = track[indexPath.row]
+        
+        let actionSheet = UIAlertController(
+            title: model.album.name,
+            message: "Add this track to your playlist",
+            preferredStyle: .actionSheet)
+        actionSheet.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        actionSheet.addAction(UIAlertAction(title: "Add to playlist", style: .default, handler: {[weak self] (_) in
+            DispatchQueue.main.async {
+                let vc = LibraryPlayListViewController()
+                vc.selectionHandler = { playList in
+                    
+                }
+                self?.present(vc, animated: true, completion: nil)
+            }
+            
+        }))
+        present(actionSheet, animated: true, completion: nil)
+    }
     private func configModels(newReleases:[Album], featuredPlayList: [Item],recomendations: [AudioTracks]){
         self.releases = newReleases
         self.playLists = featuredPlayList

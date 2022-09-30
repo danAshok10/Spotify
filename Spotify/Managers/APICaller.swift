@@ -205,7 +205,12 @@ final class APICaller{
             
             case .success(let user):
                 let url = Constant.baseURL + "/users/\(user.id)/playlists"
-                self?.createRequest(with: URL(string: url), type: .POST) { (request) in
+                self?.createRequest(with: URL(string: url), type: .POST) { [weak self](baseRequest) in
+                    var request = baseRequest
+                    let json = [
+                        "name": name
+                    ]
+                    request.httpBody = try? JSONSerialization.data(withJSONObject: json, options: .fragmentsAllowed)
                     URLSession.shared.dataTask(with: request) { (data, _, error) in
                         guard let data = data, error == nil else{
                             return
@@ -229,6 +234,28 @@ final class APICaller{
     public func addTrackToPlayList(track: AudioTracks,
                                    playList: Playlist,
                                    completion: @escaping (Bool) -> Void){
+        let url = URL(string: Constant.baseURL + "/playlists/\(playList.items.first?.id)/tracks")
+        createRequest(with: url, type: .POST) { (baseRequest) in
+            var request = baseRequest
+            let json = [
+                "playlists/playlist_id/tracks": "spotify:track:\(track.album.id)"
+            ]
+            request.httpBody = try? JSONSerialization.data(withJSONObject: json, options: .fragmentsAllowed)
+            URLSession.shared.dataTask(with: request) { (data, _, error) in
+                guard let data = data, error == nil else{
+                    return
+                }
+                do{
+                    let json = try JSONSerialization.jsonObject(with: data, options: .allowFragments)
+                    if let response = json as? [String: Any], response["snapshot_id"] as? String != nil {
+                        completion(true)
+                    }
+                    completion(true)
+                }catch{
+                    completion(false)
+                }
+            }.resume()
+        }
     }
     public func removeTrackFtomPlayList(track: AudioTracks,
                                         playList: Playlist,
