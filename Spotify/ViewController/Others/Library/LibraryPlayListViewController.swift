@@ -58,9 +58,9 @@ class LibraryPlayListViewController: UIViewController {
             guard let textfield = alert.textFields?.first , let text = textfield.text, !text.trimmingCharacters(in: .whitespaces).isEmpty else{
                 return
             }
-            APICaller.shared.createPlayList(with: text) { (sucess) in
+            APICaller.shared.createPlayList(with: text) {[weak self] (sucess) in
                 if sucess{
-                   //refresh play list UI
+                    self?.fetchData()
                 }else{
                     print("Failed to create a play list")
                 }
@@ -68,7 +68,7 @@ class LibraryPlayListViewController: UIViewController {
         }))
         present(alert, animated: true, completion: nil)
     }
-    
+   
     private func fetchData(){
         let group = DispatchGroup()
         group.enter()
@@ -143,12 +143,13 @@ extension LibraryPlayListViewController: UITableViewDataSource, UITableViewDeleg
         let item = items[indexPath.row]
         
         guard selectionHandler == nil else{
-            selectionHandler!(item)
+            selectionHandler?(item)
             dismiss(animated: true, completion: nil)
             return
         }
             
         let vc = PlayListViewController(with: item)
+        vc.isOwner = true
         navigationItem.largeTitleDisplayMode = .never
         navigationController?.pushViewController(vc, animated: true)
     }

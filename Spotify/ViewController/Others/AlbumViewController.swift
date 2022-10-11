@@ -38,24 +38,8 @@ class AlbumViewController: UIViewController, UICollectionViewDelegate, UICollect
         title = album.name
         view.backgroundColor = .red
         configCollectionview()
-        APICaller.shared.albumDetail(with: album) { (data) in
-            DispatchQueue.main.async {
-                switch data{
-                
-                case .success(let model):
-                    
-                    self.viewModels = model.tracks.items.compactMap({
-                        RecomendationCellVM(albumName: $0.name, artistName: $0.artists.first?.name ?? "_", albumImage: "", totalTracks: $0.track_number)
-                    })
-                    self.tracks
-                        .append(contentsOf: model.tracks.items)
-                case .failure(let error):
-                    print(error.localizedDescription)
-                }
-            
-                self.collectionView.reloadData()
-            }
-        }
+        fetchData()
+        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(didTapAction))
         
     }
     
@@ -76,6 +60,40 @@ class AlbumViewController: UIViewController, UICollectionViewDelegate, UICollect
         collectionView.backgroundColor = .systemBackground
         collectionView.dataSource = self
         collectionView.delegate = self
+    }
+    
+    @objc func didTapAction(){
+        let actionSheet = UIAlertController(title: album.name, message: "Save this Album to your Library", preferredStyle: .actionSheet)
+        actionSheet.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        actionSheet.addAction(UIAlertAction(title: "Save Album", style: .default, handler: { (_) in
+            APICaller.shared.saveAlbumToLibraray(album: self.album) { (response) in
+                if response{
+                    NotificationCenter.default.post(name: .albumSavedNotification, object: nil)
+                }
+            }
+        }))
+        present(actionSheet, animated: true, completion: nil)
+    }
+    
+    private func fetchData(){
+        APICaller.shared.albumDetail(with: album) { (data) in
+            DispatchQueue.main.async {
+                switch data{
+                
+                case .success(let model):
+                    
+                    self.viewModels = model.tracks.items.compactMap({
+                        RecomendationCellVM(albumName: $0.name, artistName: $0.artists.first?.name ?? "_", albumImage: "", totalTracks: $0.track_number)
+                    })
+                    self.tracks
+                        .append(contentsOf: model.tracks.items)
+                case .failure(let error):
+                    print(error.localizedDescription)
+                }
+            
+                self.collectionView.reloadData()
+            }
+        }
     }
     
     private static func createSectionalLayout() -> NSCollectionLayoutSection{

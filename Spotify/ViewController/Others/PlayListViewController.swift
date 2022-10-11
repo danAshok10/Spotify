@@ -16,6 +16,8 @@ class PlayListViewController: UIViewController,PlayListHeaderCollectionReusableV
     private var viewModels = [RecomendationCellVM]()
     private var tracks = [AudioTracks]()
     
+    public var isOwner = false
+    
     private let collectionView: UICollectionView = UICollectionView(
         frame: .zero,
         collectionViewLayout: UICollectionViewCompositionalLayout(sectionProvider: { (_, _) -> NSCollectionLayoutSection? in
@@ -31,6 +33,8 @@ class PlayListViewController: UIViewController,PlayListHeaderCollectionReusableV
     }
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        
         
         title = playList.name
        // collectionView.backgroundColor = .red
@@ -58,6 +62,10 @@ class PlayListViewController: UIViewController,PlayListHeaderCollectionReusableV
         }
         configCollectionview()
         navigationItem.rightBarButtonItem =  UIBarButtonItem(barButtonSystemItem: .reply, target: self, action: #selector(didTapShareBtn))
+        if isOwner{
+            removeTrackFromUserPlayList()
+        }
+        
     }
     
     
@@ -93,6 +101,31 @@ class PlayListViewController: UIViewController,PlayListHeaderCollectionReusableV
         collectionView.backgroundColor = .systemBackground
         collectionView.dataSource = self
         collectionView.delegate = self
+    }
+    private func removeTrackFromUserPlayList(){
+        let gesture = UILongPressGestureRecognizer(target: self, action: #selector(didTapLongPress(_:)))
+        collectionView.isUserInteractionEnabled = true
+        collectionView.addGestureRecognizer(gesture)
+    }
+    @objc func didTapLongPress(_ gesture: UILongPressGestureRecognizer){
+        guard gesture.state == .began else{
+            return
+        }
+        let touchPoint = gesture.location(in: collectionView)
+        guard let indexPath = collectionView.indexPathForItem(at: touchPoint) else{
+            return
+        }
+        let model = tracks[indexPath.row]
+        let actionSheet = UIAlertController(title: model.album.name, message: "Do you want to remove this track", preferredStyle: .actionSheet)
+        actionSheet.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        actionSheet.addAction(UIAlertAction(title: "Remove Track", style: .default, handler: { (_) in
+            APICaller.shared.removeTrackFtomPlayList(track: model, playList: self.playList) { sucess in
+                print("Track is deleted from playList: \(sucess)")
+            }
+            print("Selected track is: \(model)")
+        }))
+        present(actionSheet, animated: true, completion: nil
+        )
     }
     private static func createSectionalLayout() -> NSCollectionLayoutSection{
         

@@ -13,6 +13,7 @@ struct AudioTracks: Codable{
     let disc_number: Int
     let duration_ms: Int
     let popularity: Int
+    var id: String
     
 }
 struct Reason: Codable{

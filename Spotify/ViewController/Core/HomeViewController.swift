@@ -169,9 +169,12 @@ class HomeViewController: UIViewController {
             DispatchQueue.main.async {
                 let vc = LibraryPlayListViewController()
                 vc.selectionHandler = { playList in
-                    
+                    APICaller.shared.addTrackToPlayList(track: model, playList: playList) { (sucess) in
+                        print("Track is added to playlist \(sucess)")
+                    }
                 }
-                self?.present(vc, animated: true, completion: nil)
+                
+                self?.present(UINavigationController(rootViewController: vc), animated: true, completion: nil)
             }
             
         }))
