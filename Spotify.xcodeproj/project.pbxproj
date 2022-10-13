@@ -189,6 +189,7 @@
 			children = (
 				69109864285E4DF800F1EA02 /* AuthManager.swift */,
 				69109868285E4E0E00F1EA02 /* APICaller.swift */,
+				6910986B285E4E2300F1EA02 /* HapticsManager.swift */,
 			);
 			path = Managers;
 			sourceTree = "<group>";
@@ -204,7 +205,6 @@
 		695BDD29285E47DD007086BA = {
 			isa = PBXGroup;
 			children = (
-				6910986B285E4E2300F1EA02 /* HapticsManager.swift */,
 				695BDD34285E47DD007086BA /* Spotify */,
 				695BDD33285E47DD007086BA /* Products */,
 			);

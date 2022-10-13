@@ -68,7 +68,10 @@ class AlbumViewController: UIViewController, UICollectionViewDelegate, UICollect
         actionSheet.addAction(UIAlertAction(title: "Save Album", style: .default, handler: { (_) in
             APICaller.shared.saveAlbumToLibraray(album: self.album) { (response) in
                 if response{
+                    HapticsManager.shared.vibrate(for: .success)
                     NotificationCenter.default.post(name: .albumSavedNotification, object: nil)
+                }else{
+                    HapticsManager.shared.vibrate(for: .error)
                 }
             }
         }))

@@ -202,4 +202,13 @@ final class AuthManger{
         }
         defaults.setValue(Date().addingTimeInterval(TimeInterval(result.expires_in)), forKey: "expires_in")
     }
+    
+    public func signOut(completion: (Bool) ->  Void){
+        defaults.setValue(nil, forKey: "access_token")
+        
+        defaults.setValue(nil, forKey: "refresh_token")
+        
+        defaults.setValue(nil, forKey: "expires_in")
+        completion(true)
+    }
 }

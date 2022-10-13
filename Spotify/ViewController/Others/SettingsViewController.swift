@@ -43,8 +43,27 @@ class SettingsViewController: UIViewController, UITableViewDelegate, UITableView
             self?.signOutTapped()
         })]))
     }
-    private func signOutTapped(){
-        //func for sign out
+     func signOutTapped(){
+        
+        let alert = UIAlertController(title: "Sign Out!!!", message: "Do you want to signout?", preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: { (_) in
+            AuthManger.shared.signOut { [weak self] (sucess) in
+                if sucess{
+                    DispatchQueue.main.async {
+                        let navVC = UINavigationController(rootViewController: WelcomeViewController())
+                        navVC.navigationBar.prefersLargeTitles = true
+                        navVC.viewControllers.first?.navigationItem.largeTitleDisplayMode = .always
+                        navVC.modalPresentationStyle = .fullScreen
+                        self?.present(navVC, animated: true, completion: {
+                            self?.navigationController?.popToRootViewController(animated: false)
+                        })
+                    }
+                }
+            }
+        }))
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        present(alert, animated: true, completion: nil)
+        
     }
     
 }
@@ -62,6 +81,7 @@ extension SettingsViewController{
         return cell
     }
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        
         let model = sections[indexPath.section]
         model.option[indexPath.row].handler()
     }

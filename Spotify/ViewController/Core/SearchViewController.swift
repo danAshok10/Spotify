@@ -15,7 +15,7 @@ class SearchViewController: UIViewController, UICollectionViewDelegate , UIColle
        // let results = UIViewController()
        // results.view.backgroundColor = .red
         let searchController = UISearchController(searchResultsController: SearchResultsViewController())
-        searchController.searchBar.placeholder = "Artists,songs,podcasts"
+        searchController.searchBar.placeholder = "Artists,Tracks,Albums"
         searchController.searchBar.searchBarStyle = .minimal
         
         return searchController
@@ -99,6 +99,7 @@ extension SearchViewController{
     }
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         collectionView.deselectItem(at: indexPath, animated: true)
+        HapticsManager.shared.vibrateForSelection()
         let vc = CategoryViewController(category: searchItem[indexPath.row])
         print(searchItem[indexPath.row])
         vc.navigationItem.largeTitleDisplayMode = .never

@@ -61,7 +61,9 @@ class LibraryPlayListViewController: UIViewController {
             APICaller.shared.createPlayList(with: text) {[weak self] (sucess) in
                 if sucess{
                     self?.fetchData()
+                    HapticsManager.shared.vibrate(for: .success)
                 }else{
+                    HapticsManager.shared.vibrate(for: .error)
                     print("Failed to create a play list")
                 }
             }
@@ -141,6 +143,7 @@ extension LibraryPlayListViewController: UITableViewDataSource, UITableViewDeleg
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         let item = items[indexPath.row]
+        HapticsManager.shared.vibrateForSelection()
         
         guard selectionHandler == nil else{
             selectionHandler?(item)

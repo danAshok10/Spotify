@@ -134,6 +134,7 @@ extension SearchResultsViewController{
     }
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let result = sections[indexPath.section].results[indexPath.row]
+        HapticsManager.shared.vibrateForSelection()
         switch result{
         
         case .artist(model: let model):
